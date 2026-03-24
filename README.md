@@ -5,7 +5,7 @@ My Bot for Fluxer. Originally ported from discord.py to fluxer.py
 I worked hard for a few months to get far on my bot. This is my first ever Discord bot, and I don't want it stolen. So please, don't steal my work as I'm working hard to make a good bot.
 
 # How to use?
-N/A
+?help for available commands
 
 # Features
 - General commands: help, ping, userinfo, serverinfo, rules
