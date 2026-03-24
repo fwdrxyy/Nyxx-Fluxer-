@@ -2,6 +2,8 @@ import fluxer
 import os
 import asyncio
 from dotenv import load_dotenv
+from fluxer.enums import ChannelType
+from fluxer.models.channel import Channel
 
 bot = fluxer.Bot(command_prefix="?", intents=fluxer.Intents.default())
 
@@ -15,11 +17,31 @@ async def load_cogs():
     await bot.add_cog(Moderation(bot))
 
 # Logging functions
-def find_log_channel(guild):
+async def find_log_channel(guild):
     log_channel_names = ["logs", "mod-log"]
-    for channel in guild.text_channels:
-        if any(name in channel.name.lower() for name in log_channel_names):
-            return channel
+
+    # Discord-style API object may have text_channels attribute.
+    if hasattr(guild, "text_channels"):
+        for channel in guild.text_channels:
+            if channel and channel.name and any(name in channel.name.lower() for name in log_channel_names):
+                return channel
+
+    # Fluxer Guild object may not cache channels; fetch from API.
+    if guild._http:
+        channels_data = await guild._http.get_guild_channels(guild.id)
+    elif bot._http:
+        channels_data = await bot._http.get_guild_channels(guild.id)
+    else:
+        return None
+
+    for cdata in channels_data:
+        if cdata.get("type") == ChannelType.GUILD_TEXT and cdata.get("name"):
+            lname = cdata["name"].lower()
+            if any(name in lname for name in log_channel_names):
+                channel = Channel.from_data(cdata, bot._http)
+                channel._guild = guild
+                return channel
+
     return None
 
 @bot.event
@@ -33,7 +55,7 @@ async def on_message_delete(data):
     if not guild:
         return
 
-    log_channel = find_log_channel(guild)
+    log_channel = await find_log_channel(guild)
     if log_channel:
         author_id = data.get("author", {}).get("id") if isinstance(data.get("author"), dict) else None
         author_name = None
@@ -61,7 +83,7 @@ async def on_member_join(data):
     if not guild:
         return
 
-    log_channel = find_log_channel(guild)
+    log_channel = await find_log_channel(guild)
     if log_channel:
         name = user_data.get("username", "Unknown")
         await log_channel.send(f"{name} has joined the server.")
