@@ -1,8 +1,8 @@
 # Nyxx-Fluxer-
-My Bot for Fluxer. Originally ported from discord.py to fluxer.py
+My Bot for Fluxer. Originally ported from py-cord to fluxer.py
 
 # Please dont steal my work
-I worked hard for a few months to get far on my bot. This is my first ever Discord bot, and I don't want it stolen. So please, don't steal my work as I'm working hard to make a good bot.
+I worked hard for a few days to get far on my bot. This is my first ever fluxer bot, and I don't want it stolen. So please, don't steal my work as I'm working hard to make a good bot.
 
 # How to use?
 ?help for available commands
